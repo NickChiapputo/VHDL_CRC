@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity CRC is
-	generic( 	crcBits: integer := 16;
+	generic( 	crcBits: integer := 64;
 	
 				
 				inputSize: integer := 8 );
@@ -22,7 +22,7 @@ entity CRC is
 --			crc0:		inout std_logic;
 --			crc1:		inout std_logic;
 --			crc2:		inout std_logic;
---			crc3:		inout std_logic;
+--			crc3:		inout std_logic
 --			crc4:		inout std_logic;
 --			crc5:		inout std_logic;
 --			crc6:		inout std_logic;
@@ -93,7 +93,7 @@ architecture Behavioral of CRC is
 	-- Used to hold output of flip flops
 	signal q : std_logic_vector( crcBits - 1 downto 0 );
 begin
-	data <= init & message & ( crcBits - 1 downto 0 => '0' );
+--	data <= init & message & ( crcBits - 1 downto 0 => '0' );
 	-- LSFR Process
 	--		Input comes into Flip-Flop 0
 	--		Propagates in increasing order (i.e., 0 -> 1, 1 -> 2, etc.)
@@ -127,7 +127,67 @@ begin
 			q( 0 ) <= data( messageIndex ) xor( q( crcBits - 1 ) and g( 0 ) );
 
 			-- Use this for an accurate schematic
---			crc3 <= crcbit2 xor( crc3 and g( 3 ) );
+--			crc63 <= crc62 xor( crc63 and g( 63 ) );
+--			crc62 <= crc61 xor( crc63 and g( 62 ) );
+--			crc61 <= crc60 xor( crc63 and g( 61 ) );
+--			crc60 <= crc59 xor( crc63 and g( 60 ) );
+--			crc59 <= crc58 xor( crc63 and g( 59 ) );
+--			crc58 <= crc57 xor( crc63 and g( 58 ) );
+--			crc57 <= crc56 xor( crc63 and g( 57 ) );
+--			crc56 <= crc55 xor( crc63 and g( 56 ) );
+--			crc55 <= crc54 xor( crc63 and g( 55 ) );
+--			crc54 <= crc53 xor( crc63 and g( 54 ) );
+--			crc53 <= crc52 xor( crc63 and g( 53 ) );
+--			crc52 <= crc51 xor( crc63 and g( 52 ) );
+--			crc51 <= crc50 xor( crc63 and g( 51 ) );
+--			crc50 <= crc49 xor( crc63 and g( 50 ) );
+--			crc49 <= crc48 xor( crc63 and g( 49 ) );
+--			crc48 <= crc47 xor( crc63 and g( 48 ) );
+--			crc47 <= crc46 xor( crc63 and g( 47 ) );
+--			crc46 <= crc45 xor( crc63 and g( 46 ) );
+--			crc45 <= crc44 xor( crc63 and g( 45 ) );
+--			crc44 <= crc43 xor( crc63 and g( 44 ) );
+--			crc43 <= crc42 xor( crc63 and g( 43 ) );
+--			crc42 <= crc41 xor( crc63 and g( 42 ) );
+--			crc41 <= crc40 xor( crc63 and g( 41 ) );
+--			crc40 <= crc39 xor( crc63 and g( 40 ) );
+--			crc39 <= crc38 xor( crc63 and g( 39 ) );
+--			crc38 <= crc37 xor( crc63 and g( 38 ) );
+--			crc37 <= crc36 xor( crc63 and g( 37 ) );
+--			crc36 <= crc35 xor( crc63 and g( 36 ) );
+--			crc35 <= crc34 xor( crc63 and g( 35 ) );
+--			crc34 <= crc33 xor( crc63 and g( 34 ) );
+--			crc33 <= crc32 xor( crc63 and g( 33 ) );
+--			crc32 <= crc31 xor( crc63 and g( 32 ) );
+--			crc31 <= crc30 xor( crc63 and g( 31 ) );
+--			crc30 <= crc29 xor( crc63 and g( 30 ) );
+--			crc29 <= crc28 xor( crc63 and g( 29 ) );
+--			crc28 <= crc27 xor( crc63 and g( 28 ) );
+--			crc27 <= crc26 xor( crc63 and g( 27 ) );
+--			crc26 <= crc25 xor( crc63 and g( 26 ) );
+--			crc25 <= crc24 xor( crc63 and g( 25 ) );
+--			crc24 <= crc23 xor( crc63 and g( 24 ) );
+--			crc23 <= crc22 xor( crc63 and g( 23 ) );
+--			crc22 <= crc21 xor( crc63 and g( 22 ) );
+--			crc21 <= crc20 xor( crc63 and g( 21 ) );
+--			crc20 <= crc19 xor( crc63 and g( 20 ) );
+--			crc19 <= crc18 xor( crc63 and g( 19 ) );
+--			crc18 <= crc17 xor( crc63 and g( 18 ) );
+--			crc17 <= crc16 xor( crc63 and g( 17 ) );
+--			crc16 <= crc15 xor( crc63 and g( 16 ) );
+--			crc15 <= crc14 xor( crc63 and g( 15 ) );
+--			crc14 <= crc13 xor( crc63 and g( 14 ) );
+--			crc13 <= crc12 xor( crc63 and g( 13 ) );
+--			crc12 <= crc11 xor( crc63 and g( 12 ) );
+--			crc11 <= crc10 xor( crc63 and g( 11 ) );
+--			crc10 <= crc9 xor( crc63 and g( 10 ) );
+--			crc9 <= crc8 xor( crc63 and g( 9 ) );
+--			crc8 <= crc7 xor( crc63 and g( 8 ) );
+--			crc7 <= crc6 xor( crc63 and g( 7 ) );
+--			crc6 <= crc5 xor( crc63 and g( 6 ) );
+--			crc5 <= crc4 xor( crc63 and g( 5 ) );
+--			crc4 <= crc3 xor( crc63 and g( 4 ) );
+--			crc3 <= crc2 xor( crc3 and g( 3 ) );
 --			crc2 <= crc1 xor( crc3 and g( 2 ) );
 --			crc1 <= crc0 xor( crc3 and g( 1 ) );
 --			crc0 <= message( messageIndex ) xor( crc3 and g( 0 ) );
