@@ -2,14 +2,16 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity CRC is
-	generic( 	crcBits: integer := 64;
+	generic( 	crcBits: integer := 16;
 	
 				
 				inputSize: integer := 8 );
 
 	port(   clk:		in  std_logic;
 			rst:		in  std_logic;
-			g:			in  std_logic_vector( crcBits downto 0 );
+			init:		in  std_logic_vector( crcBits - 1 downto 0 );
+			finalXOR:	in  std_logic_vector( crcBits - 1 downto 0 );
+			g:			in  std_logic_vector( crcBits - 1 downto 0 );
 			
 			-- Use this for brevity
 			message:	in  std_logic_vector( inputSize - 1	downto 0 );
@@ -85,17 +87,13 @@ entity CRC is
 end CRC;
 
 architecture Behavioral of CRC is
-	-- Used to hold intermediate data during LFSR stages
-	signal data : std_logic_vector( inputSize + crcBits - 1 downto 0 ) := ( others => '0' );
+	-- Holds initial value, then message, then crcBits zeros
+	signal data : std_logic_vector( inputSize + ( 2 * crcBits ) - 1 downto 0 ) := ( others => '0' );
 	
 	-- Used to hold output of flip flops
 	signal q : std_logic_vector( crcBits - 1 downto 0 );
 begin
-	-- Use this for brevity
-	-- Data is now the message with crcBits zeros appended to the end
-	data( inputSize + crcBits - 1 downto crcBits ) <= message;
-	data( crcBits - 1 downto 0 ) <= ( others => '0' );
-
+	data <= init & message & ( crcBits - 1 downto 0 => '0' );
 	-- LSFR Process
 	--		Input comes into Flip-Flop 0
 	--		Propagates in increasing order (i.e., 0 -> 1, 1 -> 2, etc.)
@@ -107,11 +105,11 @@ begin
 	--			plus the length of the reset phase (should be just one clock period)
 	CRC_process : process( clk, message )
 		-- Goes through inputs from message
-		variable messageIndex : integer := inputSize + crcBits - 1;
+		variable messageIndex : integer := inputSize + ( 2 * crcBits ) - 1;
 	begin
 		if( rst = '1' ) then
 			-- Use this for brevity
-			q <= ( others => '0' );
+			q <= init;
 
 			-- Use this for an accurate schematic
 --			crc3 <= '0';
@@ -119,7 +117,7 @@ begin
 --			crc1 <= '0';
 --			crc0 <= '0';
 
-			messageIndex := inputSize + crcBits - 1;
+			messageIndex := inputSize + ( 2 * crcBits ) - 1;
 		elsif( rising_edge( clk ) and messageIndex >= 0 ) then
 		
 			-- Use this for brevity
@@ -140,5 +138,5 @@ begin
 	end process;
 
 	-- Use this for brevity
-	crcOut <= q;
+	crcOut <= q xor finalXOR;
 end Behavioral;
