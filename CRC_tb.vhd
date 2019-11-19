@@ -6,11 +6,11 @@ end CRC_tb;
 
 architecture Behavioral of CRC_tb is
 	constant inputSize : integer := 8;
-	constant crcBits : integer := 16;
+	constant crcBits : integer := 8;
 	
 	-- Takes input size + crcBits time periods to calculate CRC and one extra period for the reset
 	-- Total simulation time is set at xxx ns, minimum clock period (assuming maximum 64-bit message and 64-bit CRC) is 10 ns
-	constant clockPeriod : time := ( 1290 ns ) / ( inputSize + 2 * crcBits + 2 );
+	constant clockPeriod : time := ( 1290 ns ) / ( inputSize + crcBits + 2 );
 	
 	component CRC is
 		generic( 	crcBits: integer := crcBits;
@@ -24,6 +24,7 @@ architecture Behavioral of CRC_tb is
 			
 				-- Use this for brevity
 				message:	in  std_logic_vector( inputSize - 1	downto 0 );
+				q:			inout std_logic_vector( crcBits - 1 downto 0 );
 				crcOut:		out std_logic_vector( crcBits - 1 downto 0 )
 			
 				-- Use this for an accurate schematic
@@ -97,16 +98,17 @@ architecture Behavioral of CRC_tb is
 
 	signal clk : std_logic := '0';
 	signal rst : std_logic := '1';
-	
+	signal q : std_logic_vector( crcBits - 1 downto 0 ) := ( others => '1' );
+
 ----------------------------------------------------------------------------------
 ------------------------------- Initial Remainder --------------------------------
 	signal init : std_logic_vector( crcBits - 1 downto 0 ) := ( others =>
 	
 		-- Initialize to 0x0...0
-	'0'
+--	'0'
 	
 		-- Initialize to 0xF...F
---	'1'
+	'1'
 );
 
 	-- Custom initialization
@@ -114,17 +116,17 @@ architecture Behavioral of CRC_tb is
 
 ----------------------------------------------------------------------------------
 ----------------------------------- Final XOR ------------------------------------
---	signal finalXOR : std_logic_vector( crcBits - 1 downto 0 ) := ( others =>
+	signal finalXOR : std_logic_vector( crcBits - 1 downto 0 ) := ( others =>
 	
 		-- XOR final output with 0x0...0
---	'0'
+	'0'
 	
 		-- XOR final output with 0xF...F
 --	'1'
---);
+);
 
 	-- Custom XOR
-	signal finalXOR : std_logic_vector( crcBits - 1 downto 0 ) := "0000000000000001";
+--	signal finalXOR : std_logic_vector( crcBits - 1 downto 0 ) := "0000000000000001";
 
 ----------------------------------------------------------------------------------
 ------------------------------- Default Generators -------------------------------
@@ -181,7 +183,7 @@ architecture Behavioral of CRC_tb is
 --	"00011101"
 
 	-- CRC-8-WCDMA; Polynomial = 0x9B; p(x) = x^8 + x^7 + x^4 + x^3 + x + 1
---	"10011011"
+	"10011011"
 
 	-- CRC-10; Polynomial = 0x233; p(x) = x^10 + x^9 + x^5 + x^4 + x + 1
 --	"1000110011"
@@ -202,7 +204,7 @@ architecture Behavioral of CRC_tb is
 --	"0001000000100001"
 
 	-- CRC-16-DECT; Polynomial = 0x0589; p(x) = x^16 + x^10 + x^8 + x^7 + x^3 + 1
-	"0000010110001001"
+--	"0000010110001001"
 
 	-- CRC-16-T10-DIF; Polynomial = 0x8BB7; p(x) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 --	"1000101110110111"
@@ -283,6 +285,7 @@ begin
 					message 	=> message,
 					
 					-- Used for brevity
+					q => q,
 					crcOut 	=> crcOut
 					
 					-- Used for an accurate schematic

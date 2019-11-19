@@ -2,9 +2,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity CRC is
-	generic( 	crcBits: integer := 64;
+	generic( 	crcBits: integer := 16;
 	
-				
 				inputSize: integer := 8 );
 
 	port(   clk:		in  std_logic;
@@ -15,6 +14,7 @@ entity CRC is
 			
 			-- Use this for brevity
 			message:	in  std_logic_vector( inputSize - 1	downto 0 );
+			q:			inout std_logic_vector( crcBits - 1 downto 0 );
 			crcOut : 	out std_logic_vector( crcBits - 1 	downto 0 )
 
 			-- Use this for an accurate schematic
@@ -88,12 +88,14 @@ end CRC;
 
 architecture Behavioral of CRC is
 	-- Holds initial value, then message, then crcBits zeros
-	signal data : std_logic_vector( inputSize + ( 2 * crcBits ) - 1 downto 0 ) := ( others => '0' );
+	signal data : std_logic_vector( inputSize + crcBits - 1 downto 0 ) := ( others => '0' );
 	
 	-- Used to hold output of flip flops
-	signal q : std_logic_vector( crcBits - 1 downto 0 );
+--	signal q : std_logic_vector( crcBits - 1 downto 0 );
 begin
---	data <= init & message & ( crcBits - 1 downto 0 => '0' );
+	-- Use this for brevity
+	data <= message & ( crcBits - 1 downto 0 => '0' );
+
 	-- LSFR Process
 	--		Input comes into Flip-Flop 0
 	--		Propagates in increasing order (i.e., 0 -> 1, 1 -> 2, etc.)
@@ -105,26 +107,37 @@ begin
 	--			plus the length of the reset phase (should be just one clock period)
 	CRC_process : process( clk, message )
 		-- Goes through inputs from message
-		variable messageIndex : integer := inputSize + ( 2 * crcBits ) - 1;
+		variable messageIndex : integer := inputSize + crcBits - 1;
 	begin
 		if( rst = '1' ) then
 			-- Use this for brevity
-			q <= init;
-
+			if( rising_edge( clk ) ) then
+--				q <= data( inputSize + crcBits - 1 downto inputSize ) xor init;
+				q <= ( others => '0' );
+--				q <= init;
+			end if;
+			
 			-- Use this for an accurate schematic
 --			crc3 <= '0';
 --			crc2 <= '0';
 --			crc1 <= '0';
 --			crc0 <= '0';
 
-			messageIndex := inputSize + ( 2 * crcBits ) - 1;
+			messageIndex := inputSize + crcBits - 1;
 		elsif( rising_edge( clk ) and messageIndex >= 0 ) then
 		
 			-- Use this for brevity
 			for i in ( crcBits - 1 ) downto 1 loop
 				q( i ) <= q( i - 1 ) xor ( q( crcBits - 1 ) and g( i ) );
 			end loop;
-			q( 0 ) <= data( messageIndex ) xor( q( crcBits - 1 ) and g( 0 ) );
+--			q( 0 ) <= data( messageIndex ) xor ( q( crcBits - 1 ) and g( 0 ) );
+			
+			if( messageIndex > ( inputSize - 1 ) ) then
+				q( 0 ) <= ( data( messageIndex ) xor init( messageIndex - inputSize ) ) xor ( q( crcBits - 1 ) and g( 0 ) );
+			else
+				q( 0 ) <= data( messageIndex ) xor ( q( crcBits - 1 ) and g( 0 ) );
+			end if;		
+			report "data( " & integer'image( messageIndex ) & " ) = " & std_logic'image( data( messageIndex ) );
 
 			-- Use this for an accurate schematic
 --			crc63 <= crc62 xor( crc63 and g( 63 ) );
